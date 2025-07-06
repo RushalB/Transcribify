@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		919495752E180DE0002EEA17 /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919495742E180DE0002EEA17 /* AudioPlayer.swift */; };
+		919495772E181FB6002EEA17 /* Transcribe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919495762E181FB6002EEA17 /* Transcribe.swift */; };
+		919495792E19FF73002EEA17 /* AudioFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919495782E19FF73002EEA17 /* AudioFiles.swift */; };
 		91E6B7132E158DF70019A580 /* AudioAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91E6B7122E158DF70019A580 /* AudioAppApp.swift */; };
 		91E6B7152E158DF70019A580 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91E6B7142E158DF70019A580 /* ContentView.swift */; };
 		91E6B7172E158DF70019A580 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91E6B7162E158DF70019A580 /* Item.swift */; };
@@ -15,6 +18,8 @@
 		91E6B7262E158DF90019A580 /* AudioAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91E6B7252E158DF90019A580 /* AudioAppTests.swift */; };
 		91E6B7302E158DF90019A580 /* AudioAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91E6B72F2E158DF90019A580 /* AudioAppUITests.swift */; };
 		91E6B7322E158DF90019A580 /* AudioAppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91E6B7312E158DF90019A580 /* AudioAppUITestsLaunchTests.swift */; };
+		91F9437F2E1623B1001DE5A3 /* AudioList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F9437E2E1623B1001DE5A3 /* AudioList.swift */; };
+		91F943812E163E0D001DE5A3 /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F943802E163E0D001DE5A3 /* AudioRecorder.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +40,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		919495732E180A39002EEA17 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		919495742E180DE0002EEA17 /* AudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayer.swift; sourceTree = "<group>"; };
+		919495762E181FB6002EEA17 /* Transcribe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transcribe.swift; sourceTree = "<group>"; };
+		919495782E19FF73002EEA17 /* AudioFiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioFiles.swift; sourceTree = "<group>"; };
 		91E6B70F2E158DF70019A580 /* AudioApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		91E6B7122E158DF70019A580 /* AudioAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioAppApp.swift; sourceTree = "<group>"; };
 		91E6B7142E158DF70019A580 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -46,6 +55,8 @@
 		91E6B72B2E158DF90019A580 /* AudioAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AudioAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		91E6B72F2E158DF90019A580 /* AudioAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioAppUITests.swift; sourceTree = "<group>"; };
 		91E6B7312E158DF90019A580 /* AudioAppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioAppUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		91F9437E2E1623B1001DE5A3 /* AudioList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioList.swift; sourceTree = "<group>"; };
+		91F943802E163E0D001DE5A3 /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,11 +107,17 @@
 		91E6B7112E158DF70019A580 /* AudioApp */ = {
 			isa = PBXGroup;
 			children = (
+				919495732E180A39002EEA17 /* Info.plist */,
 				91E6B7122E158DF70019A580 /* AudioAppApp.swift */,
 				91E6B7142E158DF70019A580 /* ContentView.swift */,
+				919495742E180DE0002EEA17 /* AudioPlayer.swift */,
+				91F9437E2E1623B1001DE5A3 /* AudioList.swift */,
+				91F943802E163E0D001DE5A3 /* AudioRecorder.swift */,
+				919495762E181FB6002EEA17 /* Transcribe.swift */,
 				91E6B7162E158DF70019A580 /* Item.swift */,
 				91E6B7182E158DF90019A580 /* Assets.xcassets */,
 				91E6B71A2E158DF90019A580 /* Preview Content */,
+				919495782E19FF73002EEA17 /* AudioFiles.swift */,
 			);
 			path = AudioApp;
 			sourceTree = "<group>";
@@ -260,9 +277,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				919495792E19FF73002EEA17 /* AudioFiles.swift in Sources */,
+				91F9437F2E1623B1001DE5A3 /* AudioList.swift in Sources */,
 				91E6B7152E158DF70019A580 /* ContentView.swift in Sources */,
 				91E6B7172E158DF70019A580 /* Item.swift in Sources */,
 				91E6B7132E158DF70019A580 /* AudioAppApp.swift in Sources */,
+				91F943812E163E0D001DE5A3 /* AudioRecorder.swift in Sources */,
+				919495772E181FB6002EEA17 /* Transcribe.swift in Sources */,
+				919495752E180DE0002EEA17 /* AudioPlayer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -429,6 +451,8 @@
 				DEVELOPMENT_TEAM = 7DY72VC2BA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AudioApp/Info.plist;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is required to record audio";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -458,6 +482,8 @@
 				DEVELOPMENT_TEAM = 7DY72VC2BA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AudioApp/Info.plist;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is required to record audio";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
