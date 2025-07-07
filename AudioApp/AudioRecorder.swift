@@ -1,5 +1,5 @@
 import AVFoundation
-
+import AudioKit
 
 
 class AudioEngineRecorder : ObservableObject {
@@ -7,6 +7,11 @@ class AudioEngineRecorder : ObservableObject {
         private var file: AVAudioFile?
         @Published var isRecording = false
         @Published var isPaused = false
+    @Published var amplitudes: [Float] = []
+    
+//        private let audioKitEngine = AudioEngine()
+//        @Published var mic: Node?
+    
 
     // Observers for route changes and interuptions
         init() {
@@ -86,7 +91,7 @@ class AudioEngineRecorder : ObservableObject {
             
             let inputNode = engine.inputNode
             let bus = 0
-            let format = inputNode.outputFormat(forBus: bus)
+            //let format = inputNode.outputFormat(forBus: bus)
             let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
             let fileURL = dir.appendingPathComponent("recording123.caf")
             
@@ -105,21 +110,6 @@ class AudioEngineRecorder : ObservableObject {
                 return
             }
 
-//            let desiredSettings: [String: Any] = [
-//                AVFormatIDKey: Int(kAudioFormatLinearPCM),
-//                AVSampleRateKey: 16000,
-//                AVNumberOfChannelsKey: 1,
-//                AVLinearPCMBitDepthKey: 16,
-//                AVLinearPCMIsFloatKey: false,
-//                AVLinearPCMIsBigEndianKey: false
-//            ]
-//
-//            do {
-//                file = try AVAudioFile(forWriting: fileURL, settings: format.settings)
-//            } catch {
-//                print("Error creating audio file: \(error)")
-//                return
-//            }
 
             inputNode.installTap(onBus: bus, bufferSize: 1024, format: inputNode.outputFormat(forBus: bus)) { buffer, time in
                 do {
@@ -130,7 +120,31 @@ class AudioEngineRecorder : ObservableObject {
                         self.stopRecording()
                     }
                 }
+                if let channelData = buffer.floatChannelData?[0] {
+                        let frameLength = Int(buffer.frameLength)
+                        var rms: Float = 0
+
+                        for i in 0..<frameLength {
+                            rms += channelData[i] * channelData[i]
+                        }
+                        rms = sqrt(rms / Float(frameLength))
+
+                        DispatchQueue.main.async {
+                            self.amplitudes.append(rms)
+                            if self.amplitudes.count > 100 { // keep last 100 samples
+                                self.amplitudes.removeFirst()
+                            }
+                        }
+                    }
             }
+            
+//            mic = audioKitEngine.input
+//            audioKitEngine.output = Mixer() // silence it if you want
+//            do {
+//                try audioKitEngine.start()
+//            } catch {
+//                print("AudioKit failed to start: \(error)")
+//            }
 
 
             do {
@@ -146,6 +160,8 @@ class AudioEngineRecorder : ObservableObject {
             engine.inputNode.removeTap(onBus: 0)
             engine.stop()
             isRecording = false
+//            audioKitEngine.stop()
+
             print("Recording stopped")
             print(getRecordingURL())
             completion?()

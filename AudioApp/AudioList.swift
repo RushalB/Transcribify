@@ -14,6 +14,7 @@ struct VoiceMemoList: View {
                 VStack {
                     Spacer()
                     Text("Tap Record to Transcribe")
+                        .frame(maxWidth: .infinity)
                         .font(.title3)
                         .foregroundColor(.gray)
                         .multilineTextAlignment(.center)
@@ -68,3 +69,7 @@ struct VoiceMemoList: View {
         }
     }
 }
+#Preview {
+    VoiceMemoList()
+}
+
