@@ -28,26 +28,26 @@ class AudioEngineRecorder : ObservableObject {
             )
         }
     
-    func checkPermissionAndStart() {
-        switch AVAudioSession.sharedInstance().recordPermission {
-        case .granted:
-            startRecording()
-        case .denied:
-            print("Microphone permission denied.")
-        case .undetermined:
-            AVAudioSession.sharedInstance().requestRecordPermission { granted in
-                DispatchQueue.main.async {
-                    if granted {
-                        self.startRecording()
-                    } else {
-                        print("User denied microphone permission.")
-                    }
-                }
-            }
-        @unknown default:
-            print("Unknown microphone permission status.")
-        }
-    }
+//    func checkPermissionAndStart() {
+//        switch AVAudioSession.sharedInstance().recordPermission {
+//        case .granted:
+//            startRecording()
+//        case .denied:
+//            print("Microphone permission denied.")
+//        case .undetermined:
+//            AVAudioSession.sharedInstance().requestRecordPermission { granted in
+//                DispatchQueue.main.async {
+//                    if granted {
+//                        self.startRecording()
+//                    } else {
+//                        print("User denied microphone permission.")
+//                    }
+//                }
+//            }
+//        @unknown default:
+//            print("Unknown microphone permission status.")
+//        }
+//    }
     func isStorageAvailable(requiredSpaceMB: Double = 5.0) -> Bool {
             let fileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
             do {
