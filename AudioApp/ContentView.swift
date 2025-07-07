@@ -5,8 +5,9 @@ import SwiftData
 struct ContentView: View {
     @StateObject private var recorder = AudioEngineRecorder()
     @StateObject private var player = AudioPlayer()
-    @State private var isRecording = false
-    @State private var currentTranscript: String = ""
+
+    @State private var isTranscribing = false
+
     
     @Environment(\.modelContext) private var context
 
@@ -14,180 +15,142 @@ struct ContentView: View {
         ZStack {
             VStack {
                 Text("Transcribify")
-                    .frame(maxWidth: .infinity, alignment: .leading)
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .padding()
+                    .padding([.top, .leading, .trailing])
                     .foregroundColor(.white)
-
+                Text("Record. Transcribe. Remember.")
+                    .font(.subheadline)
+                    .fontWeight(.regular)
+                    .foregroundColor(.white)
+                //List of Recordings
+                
                 VoiceMemoList()
-
-                if isRecording {
-                    GeometryReader { geo in
-                        Path { path in
-                            for (i, amp) in recorder.amplitudes.enumerated() {
-                                let x = geo.size.width * CGFloat(i) / CGFloat(recorder.amplitudes.count)
-                                let y = geo.size.height / 2 - CGFloat(amp) * geo.size.height * 5.0
-                                if i == 0 {
-                                    path.move(to: CGPoint(x: x, y: y))
-                                } else {
-                                    path.addLine(to: CGPoint(x: x, y: y))
-                                }
-                            }
-                        }
-                        .stroke(Color.white, lineWidth: 1)
-                    }
-                    .frame(height: 150)
-                    .background(.black)
+                
+                //WaveForm
+                
+                
+                
+                if recorder.isRecording {
+                  WaveformView(amplitudes: recorder.amplitudes)
                 }
 
 
-//                Button(player.isPlaying ? "Stop Playback" : "Play Recording") {
-//                    if player.isPlaying {
-//                        player.stop()
-//                    } else {
-//                        player.play(url: recorder.getRecordingURL())
-//                    }
-//                }
-//                .disabled(!FileManager.default.fileExists(atPath: recorder.getRecordingURL().path))
-//                .padding()
-//                .foregroundColor(.white)
-
                 Spacer()
                 
-
-            
-                    Button(action: {
-                        if isRecording {
-                            recorder.stopRecording {
-                                transcribe(audioFileURL: recorder.getRecordingURL())
+                //Record Button
+                if !recorder.isRecording && !recorder.isPaused {
+                        Button(action: {
+                            recorder.startRecording()
+//                            recorder.isRecording = true
+//                            recorder.isPaused = false
+                        }) {
+                            ZStack{
+                                Image(systemName: "circle.fill")
+                                    .resizable()
+                                    .frame(width: 60, height: 60)
+                                    .foregroundColor(.red)
+                                Circle()
+                                                            .stroke(Color.white, lineWidth: 4)
+                                                            .frame(width: 80, height: 80)
+                                
                             }
                             
-                        } else {
-                            recorder.startRecording()
-                            
                         }
-                        isRecording.toggle()
-                    }) {
-                        ZStack {
-                            Rectangle()
-                                .fill(Color.black.opacity(0.4))
-                                .frame(height: 100)
-                                .edgesIgnoringSafeArea(.all)
-                                .cornerRadius(5.0)
+                        .padding()
+                    } else {
+                        HStack(spacing: 40) {
+                            Button(action: {
+                                if recorder.isPaused {
+                                    // Resume recording
+                                    recorder.resumeRecording()
+//                                    recorder.isPaused = false
+//                                    recorder.isRecording = true
+                                } else {
+                                    // Pause recording
+                                    recorder.pauseRecording()
+//                                    recorder.isPaused = true
+                                }
+                            }) {
+                                Image(systemName: recorder.isPaused ? "play.circle.fill" : "pause.circle.fill")
+                                    .resizable()
+                                    .frame(width: 60, height: 60)
+                                    .foregroundColor(recorder.isPaused ? .green : .orange)
+                            }
 
-                            Circle()
-                                .fill(isRecording ? Color.red : Color.green)
-                                .frame(width: 60, height: 60)
-
-                            Circle()
-                                .stroke(Color.white, lineWidth: 4)
-                                .frame(width: 80, height: 80)
+                            Button(action: {
+                                recorder.stopRecording {
+                                    transcribe(audioFileURL: recorder.getRecordingURL())
+                                }
+//                                recorder.isRecording = false
+//                                recorder.isPaused = false
+                            }) {
+                                Image(systemName: "stop.circle.fill")
+                                    .resizable()
+                                    .frame(width: 60, height: 60)
+                                    .foregroundColor(.red)
+                            }
                         }
-                        .padding(.top, 5.0)
+                        .padding()
                     }
-//                if isRecording {
-//                    HStack {
-//                        Button(action: {
-//                            recorder.pauseRecording() // implement this if needed
-//                            isRecording = false
-//                        }) {
-//                            ZStack {
-//                                Rectangle()
-//                                    .fill(Color.black.opacity(0.4))
-//                                    .frame(height: 100)
-//                                    .cornerRadius(5.0)
-//
-//                                Text("Pause")
-//                                    .foregroundColor(.white)
-//                                    .font(.title2)
-//                            }
-//                        }
-//
-//                        Button(action: {
-//                            recorder.stopRecording {
-//                                transcribe(audioFileURL: recorder.getRecordingURL())
-//                            }
-//                            isRecording = false
-//                        }) {
-//                            ZStack {
-//                                
-//                                Rectangle()
-//                                    .fill(Color.black.opacity(0.4))
-//                                    .frame(height: 100)
-//                                    .cornerRadius(5.0)
-//
-//                                Text("Stop")
-//                                    .foregroundColor(.white)
-//                                    .font(.title2)
-//                            }
-//                        }
-//                        
-//
-//                    }
-//                } else {
-//                    Button(action: {
-//                        recorder.startRecording()
-//                        isRecording = true
-//                    }) {
-//                        ZStack {
-//                            Rectangle()
-//                                .fill(Color.black.opacity(0.4))
-//                                .frame(height: 100)
-//                                .cornerRadius(5.0)
-//
-//                            Circle()
-//                                .fill(Color.green)
-//                                .frame(width: 60, height: 60)
-//
-//                            Circle()
-//                                .stroke(Color.white, lineWidth: 4)
-//                                .frame(width: 80, height: 80)
-//                        }
-//                        .padding(.top, 5.0)
-//                    }
-//                }
 
-                
             }
+            if isTranscribing {
+                        Color.black.opacity(0.6)
+                            .ignoresSafeArea()
+
+                        ProgressView("Transcribing...")
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.black.opacity(0.8))
+                            .cornerRadius(10)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .contentShape(Rectangle()) // to block taps below
+                    }
         }
         .background(Color.black.ignoresSafeArea())
-    }
-
-
-
-    // MARK: - Actions
+            }
 
     func transcribe(audioFileURL: URL) {
-    
+        
+        
+
         let transcriber = Transcribe()
-        
-        recorder.inspectAudioFile(at: audioFileURL)
+        Task {
+            isTranscribing = true
+            var success = false
 
-        
-        
-//        transcriber.transcribeWithGoogle(fileURL: audioFileURL) { transcript in
-//            if let text = transcript {
-//                print("Final transcription: \(text)")
-//                        addSession(to: context,
-//                                           title: "Recording \(Date())",
-//                                           fileURL: audioFileURL.path,
-//                                           transcription: text)
-//            } else {
-//                print("Failed to get transcription")
-//            }
-//        }
-        
+            for attempt in 1...5 {
+                print("Attempt \(attempt)")
+                do {
+                    let (stitched,_) = try await transcriber.transcribeAndStitchAsync(audioFileURL: audioFileURL)
+                    print("Final Transcription:\n\(stitched)")
+                            addSession(to: context,
+                                       title: "Recording \(Date())",
+                                       fileURL: audioFileURL.path,
+                                        transcription: stitched)
+                    success = true
+                    break
+                } catch {
+                    print("Error: \(error)")
+                }
+            }
 
-        transcriber.transcribeWithApple(fileURL: audioFileURL ){ transcript in
-//        addSession(to: context,
-//                           title: "Recording \(Date())",
-//                           fileURL: audioFileURL.path,
-//                           transcription: transcript)
-        print("Received transcript: \(transcript)")
-        
+            if !success {
+                transcriber.transcribeWithApple(fileURL: audioFileURL ){ transcript in
+                addSession(to: context,
+                                   title: "Recording \(Date())",
+                                   fileURL: audioFileURL.path,
+                                   transcription: "Offline Transcription:"+"\n"+transcript)
+                print("Apple's transcript: \(transcript)")
+                
+                
+                }
+            }
+            recorder.isRecording = false
+            isTranscribing = false
         }
-
     }
     
     
@@ -198,10 +161,34 @@ struct ContentView: View {
         transcription: String = "",
         duration: Double = 0
     ) {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
+        let timestamp = formatter.string(from: Date())
+        let uniqueFileName = "Recording_\(timestamp).caf"
+
+        let destinationURL = FileManager.default
+            .urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent(uniqueFileName)
+
+        let originalURL = URL(fileURLWithPath: fileURL)
+
+        do {
+            try FileManager.default.copyItem(at: originalURL, to: destinationURL)
+            print("Audio file copied to: \(destinationURL.path)")
+            
+            try FileManager.default.setAttributes(
+                        [.protectionKey: FileProtectionType.complete],
+                        ofItemAtPath: destinationURL.path
+                    )
+                    print("File protection set to .complete")
+            
+        } catch {
+            print("Failed to copy file: \(error)")
+        }
         let session = RecordingSession(
             createdAt: Date(),
             duration: duration,
-            fileURL: fileURL,
+            fileURL: destinationURL.path,
             title: title,
             transcriptionText: transcription
         )
@@ -211,7 +198,4 @@ struct ContentView: View {
 
 }
 
-//}
-#Preview {
-    ContentView()
-}
+

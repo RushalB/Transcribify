@@ -1,5 +1,5 @@
 import AVFoundation
-import AudioKit
+
 
 
 class AudioEngineRecorder : ObservableObject {
@@ -7,11 +7,9 @@ class AudioEngineRecorder : ObservableObject {
         private var file: AVAudioFile?
         @Published var isRecording = false
         @Published var isPaused = false
-    @Published var amplitudes: [Float] = []
+        @Published var amplitudes: [Float] = []
     
-//        private let audioKitEngine = AudioEngine()
-//        @Published var mic: Node?
-    
+
 
     // Observers for route changes and interuptions
         init() {
@@ -29,30 +27,27 @@ class AudioEngineRecorder : ObservableObject {
                 object: nil
             )
         }
-
-    //this is an ios 17.0 issue
-//    func checkPermissionAndStart() {
-//        switch AVAudioSession.sharedInstance().recordPermission {
-//        case .granted:
-//            startRecording()
-//        case .denied:
-//            print("Microphone permission denied.")
-//            // Inform user, maybe send a delegate/closure callback
-//        case .undetermined:
-//            AVAudioSession.sharedInstance().requestRecordPermission { granted in
-//                DispatchQueue.main.async {
-//                    if granted {
-//                        self.startRecording()
-//                    } else {
-//                        print("User denied microphone permission.")
-//                        // Inform user, update UI accordingly
-//                    }
-//                }
-//            }
-//        @unknown default:
-//            print("Unknown microphone permission status.")
-//        }
-//    }
+    
+    func checkPermissionAndStart() {
+        switch AVAudioSession.sharedInstance().recordPermission {
+        case .granted:
+            startRecording()
+        case .denied:
+            print("Microphone permission denied.")
+        case .undetermined:
+            AVAudioSession.sharedInstance().requestRecordPermission { granted in
+                DispatchQueue.main.async {
+                    if granted {
+                        self.startRecording()
+                    } else {
+                        print("User denied microphone permission.")
+                    }
+                }
+            }
+        @unknown default:
+            print("Unknown microphone permission status.")
+        }
+    }
     func isStorageAvailable(requiredSpaceMB: Double = 5.0) -> Bool {
             let fileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
             do {
@@ -76,7 +71,6 @@ class AudioEngineRecorder : ObservableObject {
         func startRecording() {
             guard isStorageAvailable() else {
                 print("Insufficient storage space to start recording.")
-                // Notify user to free up space
                 return
             }
             
@@ -91,7 +85,6 @@ class AudioEngineRecorder : ObservableObject {
             
             let inputNode = engine.inputNode
             let bus = 0
-            //let format = inputNode.outputFormat(forBus: bus)
             let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
             let fileURL = dir.appendingPathComponent("recording123.caf")
             
@@ -110,8 +103,7 @@ class AudioEngineRecorder : ObservableObject {
                 return
             }
 
-
-            inputNode.installTap(onBus: bus, bufferSize: 1024, format: inputNode.outputFormat(forBus: bus)) { buffer, time in
+            inputNode.installTap(onBus: bus, bufferSize: 4096, format: inputNode.outputFormat(forBus: bus)) { buffer, time in
                 do {
                     try self.file?.write(from: buffer)
                 } catch {
@@ -137,15 +129,6 @@ class AudioEngineRecorder : ObservableObject {
                         }
                     }
             }
-            
-//            mic = audioKitEngine.input
-//            audioKitEngine.output = Mixer() // silence it if you want
-//            do {
-//                try audioKitEngine.start()
-//            } catch {
-//                print("AudioKit failed to start: \(error)")
-//            }
-
 
             do {
                 try engine.start()
@@ -160,20 +143,22 @@ class AudioEngineRecorder : ObservableObject {
             engine.inputNode.removeTap(onBus: 0)
             engine.stop()
             isRecording = false
-//            audioKitEngine.stop()
 
             print("Recording stopped")
             print(getRecordingURL())
+            amplitudes = []
             completion?()
         }
+        
         func pauseRecording() {
-            engine.pause()
-            isPaused = true
-            print("Recording paused")
-        }
+                engine.pause()
+                isPaused = true
+                print("Recording paused")
+            }
 
         func resumeRecording() {
             do {
+                
                 try engine.start()
                 isPaused = false
                 print("Recording resumed")
@@ -188,61 +173,10 @@ class AudioEngineRecorder : ObservableObject {
                 .appendingPathComponent("recording123.caf")
             
         }
-    func inspectAudioFile(at url: URL) {
-        do {
-            let audioFile = try AVAudioFile(forReading: url)
-            let format = audioFile.fileFormat
-            
-            print("Sample Rate: \(format.sampleRate)")
-            print("Channels: \(format.channelCount)")
-            print("Common Format: \(format.commonFormat.rawValue)")
-            print("Interleaved: \(format.isInterleaved)")
-            
-            switch format.commonFormat {
-            case .pcmFormatInt16:
-                print("✅ File is 16-bit signed PCM (LINEAR16) — good for Google.")
-            case .pcmFormatInt32:
-                print("⚠️ File is 32-bit integer PCM — not what Google expects.")
-            case .pcmFormatFloat32:
-                print("⚠️ File is 32-bit float PCM — convert to LINEAR16.")
-            default:
-                print("❓ Unexpected format: \(format.commonFormat)")
-            }
-            
-        } catch {
-            print("Error opening audio file: \(error)")
-        }
-    }
-    func printAudioFileInfo(url: URL) {
-        do {
-            let audioFile = try AVAudioFile(forReading: url)
-            let format = audioFile.processingFormat
-            let sampleRate = format.sampleRate
-            let channels = format.channelCount
-            let commonFormat = format.commonFormat
-
-            print("Sample Rate: \(sampleRate) Hz")
-            print("Channels: \(channels)")
-            print("Common Format: \(commonFormat)")
-
-
-            let formatSettings = audioFile.fileFormat.settings
-            if let formatID = formatSettings[AVFormatIDKey] as? UInt32 {
-                switch formatID {
-                case kAudioFormatLinearPCM:
-                    print("Format: Linear PCM")
-                case kAudioFormatULaw:
-                    print("Format: µ-law")
-                case kAudioFormatALaw:
-                    print("Format: A-law")
-                default:
-                    print("Format ID: \(formatID)")
-                }
-            }
-        } catch {
-            print("Failed to read audio file: \(error)")
-        }
-    }
+    
+    
+    // ------ Handle Interuptions ---------- //
+    
     
     @objc private func handleRouteChange(notification: Notification) {
         guard let userInfo = notification.userInfo,
@@ -259,12 +193,9 @@ class AudioEngineRecorder : ObservableObject {
             }
         case .newDeviceAvailable:
             print("New audio device available.")
-//            if isRecording && isPaused {
-//                resumeRecording()
-//            }
-            ///FIx this pausing thingy
-            ///
-
+            if isRecording && isPaused {
+                resumeRecording()
+            }
         default:
             break
         }

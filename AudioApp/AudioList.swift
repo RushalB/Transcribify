@@ -2,7 +2,6 @@ import SwiftUI
 import SwiftData
 
 struct VoiceMemoList: View {
-    // Fetch all sessions, sorted by date descending
     @Query(sort: \RecordingSession.createdAt, order: .reverse)
     private var sessions: [RecordingSession]
     
@@ -25,33 +24,41 @@ struct VoiceMemoList: View {
             } else {
                 List {
                     ForEach(sessions) { session in
-                        VStack(alignment: .leading) {
-                            Text(session.title.isEmpty ? "Untitled" : session.title)
-                                .font(.headline)
-                                .foregroundColor(.white)
-                            
-                            Text(session.createdAt.formatted(date: .abbreviated, time: .shortened))
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                            
-                            if !session.transcriptionText.isEmpty {
-                                Text(session.transcriptionText)
+                        NavigationLink(destination: SessionDetailView(session: session)) {
+                            VStack(alignment: .leading) {
+                                Text(session.title.isEmpty ? "Untitled" : session.title)
+                                    .font(.headline)
                                     .foregroundColor(.white)
-                                    .lineLimit(3)
+                                
+                                Text(session.createdAt.formatted(date: .abbreviated, time: .shortened))
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                                
+                                if !session.transcriptionText.isEmpty {
+                                    Text(session.transcriptionText)
+                                        .foregroundColor(.white)
+                                        .lineLimit(1)
+                                }
                             }
+                            .padding(.vertical)
+//                            .frame(maxWidth: .infinity)
                         }
-                        .padding()
-                        .background(Color.black)
+                        .listRowBackground(Color.black)
                     }
                     .onDelete(perform: deleteSessions)
                 }
+                .scrollContentBackground(.hidden)
                 .background(Color.black)
                 .navigationTitle("Recordings")
+
+
             }
         }
     }
     
-    //For testing purposes
+    
+
+    
     private func addSession() {
         let session = RecordingSession(
             createdAt: Date(),
@@ -69,7 +76,3 @@ struct VoiceMemoList: View {
         }
     }
 }
-#Preview {
-    VoiceMemoList()
-}
-

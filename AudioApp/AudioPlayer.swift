@@ -28,6 +28,16 @@ class AudioPlayer: NSObject, ObservableObject {
         player?.stop()
         isPlaying = false
     }
+    
+    func pause() {
+        player?.pause()
+        isPlaying = false
+    }
+
+    func resume() {
+        player?.play()
+        isPlaying = true
+    }
 
 
 }
